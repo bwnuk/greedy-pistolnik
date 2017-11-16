@@ -10,10 +10,10 @@ public:
 	~Player();
 
 	void Update(float deltaTime);
-	void Draw(sf::RenderWindow &window);
-	sf::View view;
+	void Draw(sf::RenderWindow &window, sf::View view);
+	//sf::View view;
 	Collider GetCollider() { return Collider(body); }
-
+	
 	sf::Vector2f GetPosition() { return  body.getPosition(); }
 
 private:
