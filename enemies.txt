@@ -1,1 +1,2 @@
-adam
+adam 5 5 5
+marcin 5 5 5

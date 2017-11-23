@@ -7,7 +7,6 @@
 
 void load(std::vector<enemy>&mobs);
 
-
 int main()
 {
 	std::vector<enemy>mobs;
@@ -79,6 +78,17 @@ void load(std::vector<enemy>&mobs)
 		temp_line.clear();
 		getline(enemies, temp_line, ' ');
 		mobs[i].set_name(temp_line);
+
+		getline(enemies, temp_line, ' ');
+		mobs[i].set_hp(std::stoi(temp_line));
+
+		getline(enemies, temp_line, ' ');
+		mobs[i].set_lvl(std::stoi(temp_line));
+
+		getline(enemies, temp_line);
+		mobs[i].set_speed(std::stoi(temp_line));
+		i++;
+
 		// i tak dalej wszystko co bedzie potrzebne 
 	}
 }
