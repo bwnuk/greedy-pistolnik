@@ -1,2 +1,3 @@
-adam 5 5 5
-marcin 5 5 5
+adam 5 10 0.5
+marcin 10 11 0.6
+kowal 10 11 0.2
