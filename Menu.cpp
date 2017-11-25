@@ -173,11 +173,12 @@ void Menu::game()
 
 void Menu::shoot()
 {
-	sf::Texture background_texture;
-	background_texture.loadFromFile("images/shootBCG1.jpg");
+	sf::Texture background_texture1;
+	background_texture1.loadFromFile("images/shootBCG1.jpg");
 	sf::Sprite map1;
-	map1.setTexture(background_texture);
-
+	map1.setTexture(background_texture1);
+	map1.setScale(sf::Vector2f(1.2f, 1.6f));
+	map1.setPosition(0,-140);
 	sf::View viewShoot;
 
 	srand(time(NULL));
@@ -299,36 +300,40 @@ void Menu::shoot()
 			enemy target4(targetTexture4);
 			enemy target5(targetTexture5);
 			enemy target6(targetTexture6);
-			
+
+			int temp_size_up = window.getSize().y / 2.0f - 120.0f;
+			int temp_size_down = window.getSize().y - 300.0f;
+			int temp_size_width = window.getSize().x - 50.0f;
+
 			switch (random)
 			{
 			case 1:
-				target1.Position(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
+				target1.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
 				targets.push_back(target1);
 				break;
 
 			case 2:
-				target2.Position(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
+				target2.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
 				targets.push_back(target2);
 				break;
 
 			case 3:
-				target3.Position(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
+				target3.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
 				targets.push_back(target3);
 				break;
 
 			case 4:
-				target4.Position(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
+				target4.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
 				targets.push_back(target4);
 				break;
 
 			case 5:
-				target5.Position(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
+				target5.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
 				targets.push_back(target5);
 				break;
 
 			case 6:
-				target6.Position(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
+				target6.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
 				targets.push_back(target6);
 				break;
 			}
