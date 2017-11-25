@@ -8,6 +8,7 @@
 class enemy
 {
 public:
+	void update();
 	enemy(sf::Texture &);
 	void set_name(std::string);
 	std::string get_name();
@@ -24,6 +25,8 @@ public:
 
 
 	sf::RectangleShape body;
+	sf::Texture enemy_texture;
+
 
 private:
 	std::string name;
@@ -33,7 +36,7 @@ private:
 	
 	sf::Vector2f sizeBody;
 	sf::Vector2f tempsize;
-	sf::Texture enemy_texture;
+
 
 };
 
