@@ -341,6 +341,7 @@ void Menu::shoot()
 			enemy target5(targetTexture5);
 			enemy target6(targetTexture6);
 
+
 			int temp_size_up = window.getSize().y / 2.0f - 100.0f;
 			int temp_size_down = window.getSize().y - 300.0f;
 			int temp_size_width = window.getSize().x - 100.0f;
@@ -411,9 +412,7 @@ void Menu::shoot()
 
 		if (killCounter == 5)
 		{
-			std::cout << 407;
-			game();
-			
+			return;	
 		}
 			
 
