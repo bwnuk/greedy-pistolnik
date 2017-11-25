@@ -48,11 +48,16 @@ void Menu::menu()
 {
 	sf::View viewMenu;
 	sf::Texture text;
+
 	text.loadFromFile("images/tlo.jpg");
+	
 	sf::RectangleShape sprait;
 	sprait.setTexture(&text);
 	sf::Vector2f sizeImageMenu(WIDTH, HEIGHT);
 	sprait.setSize(sizeImageMenu);
+	sprait.setPosition(0.0f, -100.0f);
+	sprait.setScale(1.0f, 1.3f);
+	
 	sf::Text title("Greedy Pistolnik", font, 80);
 	title.setStyle(sf::Text::Bold);
 	title.setColor(sf::Color::Yellow);
@@ -69,7 +74,7 @@ void Menu::menu()
 		tekst[i].setCharacterSize(60);
 
 		tekst[i].setString(str[i]);
-		tekst[i].setPosition(WIDTH / 2 - tekst[i].getGlobalBounds().width / 2, 250 + i * 120);
+		tekst[i].setPosition(WIDTH / 2 - tekst[i].getGlobalBounds().width / 2, 200 + i * 70);
 	}
 
 	while (state == MENU)
@@ -114,7 +119,7 @@ void Menu::menu()
 
 			for (int i = 0; i<ile; i++)
 				window.draw(tekst[i]);
-
+			window.setView(viewMenu);
 			window.display();
 	}
 }
@@ -126,23 +131,33 @@ void Menu::game()
 	sf::Texture background_texture;
 	sf::Texture shop_texture;
 	sf::Sprite map;
+	
 	texture.loadFromFile("images/player.png");
 	background_texture.loadFromFile("images/background.jpg");
 	shop_texture.loadFromFile("images/shop.png");
+	
 	map.setTexture(background_texture);
 	map.setPosition(0.0f, 0.0f);
+	
 	player player(texture, sf::Vector2u(3, 4), 2.0f, 0.1f, 140.0f);
+	
 	float deltatime = 0.0f;
 	float timer = 0.0f;
+	
 	sf::Clock clock;
 	sf::View view;
 	sf::Vector2f sizeBG(background_texture.getSize());
+	
+	//Screen lock
 	Fence upLock(nullptr, sf::Vector2f(sizeBG.x, 0.0f), sf::Vector2f(sizeBG.x/2.0f, 0.0f));
 	Fence leftLock(nullptr, sf::Vector2f(0.0f, sizeBG.y), sf::Vector2f(0.0f, sizeBG.y/2.0f));
 	Fence rightLock(nullptr, sf::Vector2f(0.0f,sizeBG.y), sf::Vector2f(sizeBG.x, sizeBG.y / 2.0f));
 	Fence downLock(nullptr, sf::Vector2f(sizeBG.x, 0.0f), sf::Vector2f(sizeBG.x/2.0f, sizeBG.y));
+	
+	//Building
 	Fence shop(&shop_texture, sf::Vector2f(400.0f, 400.0f), sf::Vector2f(200.0f, 200.0f));
 	Fence door(nullptr, sf::Vector2f(0.01f, 0.01f), sf::Vector2f(230.0f, 400.1f));
+	
 	while (window.isOpen())
 	{
 		deltatime = clock.restart().asSeconds();
@@ -158,18 +173,22 @@ void Menu::game()
 			if (zdarzenie.type == sf::Event::MouseButtonPressed && zdarzenie.mouseButton.button == sf::Mouse::Middle)
 				window.close();
 		}
+
+		//Lock
 		upLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		rightLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		leftLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		downLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
+		
 		shop.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
+		
 		player.Update(deltatime);
-		if(door.GetCollider().CheckCollision(player.GetCollider(), 1.0f) && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && player.direction == 2)
+		
+		if(door.GetCollider().CheckCollision(player.GetCollider(), 1.0f) && (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || player.direction == 2))
 		{
-			state = SHOOTING;
-			//text();
+			//state = SHOOTING;
+			text();
 			state = MENU;
-			menu();
 			shoot();
 		}
 		view.setCenter(player.GetPosition());
@@ -191,6 +210,12 @@ void Menu::game()
 
 void Menu::shoot()
 {
+	sf::Texture background_texture1;
+	background_texture1.loadFromFile("images/shootBCG1.jpg");
+	sf::Sprite map1;
+	map1.setTexture(background_texture1);
+	map1.setScale(sf::Vector2f(1.2f, 1.6f));
+	map1.setPosition(0, -140);
 	sf::View viewShoot;
 
 	srand(time(NULL));
@@ -209,11 +234,16 @@ void Menu::shoot()
 	int spawnCounter = 0;
 
 	//Targets
-	sf::Texture targetTexture;
-	targetTexture.loadFromFile("images/enemy.png");
-	enemy target(targetTexture);
+	sf::Texture targetTexture1;
+	sf::Texture targetTexture2;
+	sf::Texture targetTexture3;
+	sf::Texture targetTexture4;
+	sf::Texture targetTexture5;
+	sf::Texture targetTexture6;
+
 	std::vector<enemy> targets;
 
+	//
 
 	//Wektory, potrzebne
 	sf::Vector2f gunCenter;
@@ -268,10 +298,83 @@ void Menu::shoot()
 
 		if (spawnCounter >= 40 && targets.size() < 10)
 		{
+			//Random texture spawning
+
+			int random = rand() % 6 + 1;
+
 			spawnCounter = 0;
 
-			target.Position(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
-			targets.push_back(target);
+			switch (random)
+			{
+			case 1:
+				targetTexture1.loadFromFile("images/10.png");
+				break;
+
+			case 2:
+				targetTexture2.loadFromFile("images/11.png");
+				break;
+
+			case 3:
+				targetTexture3.loadFromFile("images/12.png");
+				break;
+
+			case 4:
+				targetTexture4.loadFromFile("images/13.png");
+				break;
+
+			case 5:
+				targetTexture5.loadFromFile("images/14.png");
+				break;
+
+			case 6:
+				targetTexture6.loadFromFile("images/14.png");
+				break;
+			}
+
+			enemy target1(targetTexture1);
+			enemy target2(targetTexture2);
+			enemy target3(targetTexture3);
+			enemy target4(targetTexture4);
+			enemy target5(targetTexture5);
+			enemy target6(targetTexture6);
+
+			int temp_size_up = window.getSize().y / 2.0f - 120.0f;
+			int temp_size_down = window.getSize().y - 300.0f;
+			int temp_size_width = window.getSize().x - 50.0f;
+
+			switch (random)
+			{
+			case 1:
+				target1.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
+				targets.push_back(target1);
+				break;
+
+			case 2:
+				target2.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
+				targets.push_back(target2);
+				break;
+
+			case 3:
+				target3.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
+				targets.push_back(target3);
+				break;
+
+			case 4:
+				target4.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
+				targets.push_back(target4);
+				break;
+
+			case 5:
+				target5.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
+				targets.push_back(target5);
+				break;
+
+			case 6:
+				target6.Position(sf::Vector2f(rand() % temp_size_width + 50.0f, rand() % temp_size_down + temp_size_up));
+				targets.push_back(target6);
+				break;
+			}
+
 		}
 
 		//Shooting
@@ -298,11 +401,13 @@ void Menu::shoot()
 		//Drawing
 
 		window.clear();
+		window.draw(map1);
 		for (size_t i = 0; i < targets.size(); i++)
 		{
 
 			window.draw(targets[i].body);
 		}
+
 		viewShoot.setCenter(WIDTH / 2.0f, HEIGHT / 2.0f);
 		window.setView(viewShoot);
 		window.draw(gun);
@@ -375,6 +480,7 @@ void Menu::autor()
 void Menu::text()
 {
 	const int CHATPOSITION = 500;
+
 	sf::View viewText;
 	sf::Texture winChat;
 	winChat.loadFromFile("images/chat2.jpg");
