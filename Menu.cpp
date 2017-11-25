@@ -1,10 +1,8 @@
 ﻿#include "Menu.h"
 
-const int WIDTH = 1280;
+const int WIDTH = 1100;
 const int HEIGHT = 720;
 sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "Greedy Pistolnik", sf::Style::Titlebar | sf::Style::Close);
-sf::RectangleShape gun(sf::Vector2f(50.0f, 100.0f));
-sf::Texture gunTexture;
 
 Menu::Menu(void)
 {
@@ -34,9 +32,10 @@ void Menu::runGame()
 			menu();
 			break;
 		case GameState::GAME:
-			//
 			game();
 			break;
+		case GameState::SHOOTING:
+			shoot();
 		case GameState::AUTORS:
 			autor();
 			break;
@@ -49,14 +48,14 @@ void Menu::menu()
 {
 	sf::Texture text;
 	text.loadFromFile("images/tlo.jpg");
-	sf::Sprite sprait;
-	sprait.setTexture(text);
-	sprait.setScale(sf::Vector2f(0.83f, 0.83f));
-
-	sf::Text title("Greedy Pistolnik", font, 90);
+	sf::RectangleShape sprait;
+	sprait.setTexture(&text);
+	sf::Vector2f sizeImageMenu(WIDTH, HEIGHT);
+	sprait.setSize(sizeImageMenu);
+	sf::Text title("Greedy Pistolnik", font, 80);
 	title.setStyle(sf::Text::Bold);
-
-	title.setPosition(WIDTH / 2 - title.getGlobalBounds().width / 2, 20);
+	title.setColor(sf::Color::Yellow);
+	title.setPosition(WIDTH / 2 - title.getGlobalBounds().width / 2, 100.0f);
 
 	const int ile = 3;
 
@@ -119,12 +118,8 @@ void Menu::menu()
 	}
 }
 
-void::Menu::game()
+void Menu::game()
 {
-	gunTexture.loadFromFile("strzelba.png");
-	gun.setTexture(&gunTexture);
-	gun.setOrigin(gun.getSize() / 2.0f);
-	gun.setPosition(0, 0);
 	//////////////////////////
 	sf::Texture texture;
 	texture.loadFromFile("images/player2.png");
@@ -159,7 +154,10 @@ void::Menu::game()
 		player.Update(deltatime);
 		fence1.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		if (fence2.GetCollider().CheckCollision(player.GetCollider(), 1.0f))
-			shoot(view);
+		{
+			state = SHOOTING;
+			return;
+		}
 		fence3.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		view.setCenter(player.GetPosition());
 
@@ -173,15 +171,19 @@ void::Menu::game()
 	}
 }
 
-void::Menu::shoot(sf::View &viewShoot)
+void Menu::shoot()
 {
-	
+	sf::View viewShoot;
 	srand(time(NULL));
 	//Window
 	window.setFramerateLimit(60);
 	//Gun
-	viewShoot.setCenter(WIDTH/2.0f, HEIGHT/2.0f);
-	sf::Vector2f sprawdz(gun.getPosition());
+	sf::RectangleShape gun(sf::Vector2f(50.0f, 100.0f));
+	sf::Texture gunTexture;
+	gunTexture.loadFromFile("strzelba.png");
+	gun.setTexture(&gunTexture);
+	gun.setOrigin(gun.getSize() / 2.0f);
+	gun.setPosition(WIDTH/2.0f, HEIGHT + 50.0f);
 	int spawnCounter = 0;
 	//std::cout << sprawdz.x << " " << sprawdz.y;
 	//Targets
@@ -230,7 +232,6 @@ void::Menu::shoot(sf::View &viewShoot)
 			}
 
 		}
-
 		//Liczymy wektory
 
 		gunCenter = sf::Vector2f(gun.getPosition().x, gun.getPosition().y);
@@ -280,12 +281,14 @@ void::Menu::shoot(sf::View &viewShoot)
 
 			window.draw(targets[i]);
 		}
+		viewShoot.setCenter(WIDTH/2.0f, HEIGHT/2.0f);
+		window.setView(viewShoot);
 		window.draw(gun);
 		window.draw(crosshairRect);
-
 		window.display();
 	}
 }
+
 void Menu::autor()
 {
 	sf::Text title("Autorzy :", font, 90);

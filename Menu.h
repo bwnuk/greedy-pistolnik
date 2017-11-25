@@ -20,7 +20,7 @@ public:
 	void runGame();
 	
 protected:
-	enum GameState { MENU, GAME, AUTORS, GAME_OVER, END };
+	enum GameState { MENU, GAME, SHOOTING, AUTORS, GAME_OVER, END };
 	GameState state;
 
 private:
@@ -28,6 +28,6 @@ private:
 	
 	void menu();
 	void game();
-	void shoot(sf::View &viewShoot);
+	void shoot();
 	void autor();
 };
