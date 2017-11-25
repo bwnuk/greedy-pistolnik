@@ -1,5 +1,4 @@
 ﻿#include "Menu.h"
-#include "enemy.h"
 
 const int WIDTH = 1100;
 const int HEIGHT = 720;
@@ -9,7 +8,7 @@ Menu::Menu(void)
 {
 	state = END;
 
-	if (!font.loadFromFile("jendrzej.ttf"))
+	if (!font.loadFromFile("images/jendrzej.ttf"))
 	{
 		return;
 	}
@@ -47,6 +46,7 @@ void Menu::runGame()
 
 void Menu::menu()
 {
+	sf::View viewMenu;
 	sf::Texture text;
 	text.loadFromFile("images/tlo.jpg");
 	sf::RectangleShape sprait;
@@ -62,7 +62,7 @@ void Menu::menu()
 
 	sf::Text tekst[ile];
 
-	string str[] = { "Graj","Autorzy","Exit" };
+	std::string str[] = { "Graj","Autorzy","Exit" };
 	for (int i = 0; i<ile; i++)
 	{
 		tekst[i].setFont(font);
@@ -76,9 +76,10 @@ void Menu::menu()
 	{
 		sf::Vector2f mouse(sf::Mouse::getPosition(window));
 		sf::Event event;
-
 		while (window.pollEvent(event))
 		{
+			viewMenu.setCenter(WIDTH / 2.0f, HEIGHT / 2.0f);
+			//window.setView(viewMenu);
 			//Wciœniêcie ESC lub przycisk X
 			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed &&
 				event.key.code == sf::Keyboard::Escape)
@@ -108,7 +109,6 @@ void Menu::menu()
 			else tekst[i].setFillColor(sf::Color::White);
 
 			window.clear();
-
 			window.draw(sprait);
 			window.draw(title);
 
@@ -123,20 +123,26 @@ void Menu::game()
 {
 	//////////////////////////
 	sf::Texture texture;
-	texture.loadFromFile("images/player2.png");
 	sf::Texture background_texture;
-	background_texture.loadFromFile("images/background.png");
+	sf::Texture shop_texture;
 	sf::Sprite map;
+	texture.loadFromFile("images/player.png");
+	background_texture.loadFromFile("images/background.jpg");
+	shop_texture.loadFromFile("images/shop.png");
 	map.setTexture(background_texture);
-	player player(texture, sf::Vector2u(9, 4), 2.0f, 0.09f, 140.0f);
+	map.setPosition(0.0f, 0.0f);
+	player player(texture, sf::Vector2u(3, 4), 2.0f, 0.1f, 140.0f);
 	float deltatime = 0.0f;
 	float timer = 0.0f;
 	sf::Clock clock;
 	sf::View view;
-	Fence fence1(nullptr, sf::Vector2f(200.0f, 200.0f), sf::Vector2f(0.0f, 0.0f));
-	Fence fence2(nullptr, sf::Vector2f(200.0f, 200.0f), sf::Vector2f(200.0f + player.collisionSize, 0.0f));
-	Fence fence3(nullptr, sf::Vector2f(200.0f, 200.0f), sf::Vector2f(0.0f, 200.0f + player.collisionSize));
-	//Fence fence2(nullptr, sf::Vector2f(200.0f, 200.0f), sf::Vector2f(0.0f, 272.0f));
+	sf::Vector2f sizeBG(background_texture.getSize());
+	Fence upLock(nullptr, sf::Vector2f(sizeBG.x, 0.0f), sf::Vector2f(sizeBG.x/2.0f, 0.0f));
+	Fence leftLock(nullptr, sf::Vector2f(0.0f, sizeBG.y), sf::Vector2f(0.0f, sizeBG.y/2.0f));
+	Fence rightLock(nullptr, sf::Vector2f(0.0f,sizeBG.y), sf::Vector2f(sizeBG.x, sizeBG.y / 2.0f));
+	Fence downLock(nullptr, sf::Vector2f(sizeBG.x, 0.0f), sf::Vector2f(sizeBG.x/2.0f, sizeBG.y));
+	Fence shop(&shop_texture, sf::Vector2f(400.0f, 400.0f), sf::Vector2f(200.0f, 200.0f));
+	Fence door(nullptr, sf::Vector2f(0.01f, 0.01f), sf::Vector2f(230.0f, 400.1f));
 	while (window.isOpen())
 	{
 		deltatime = clock.restart().asSeconds();
@@ -152,21 +158,32 @@ void Menu::game()
 			if (zdarzenie.type == sf::Event::MouseButtonPressed && zdarzenie.mouseButton.button == sf::Mouse::Middle)
 				window.close();
 		}
+		upLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
+		rightLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
+		leftLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
+		downLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
+		shop.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		player.Update(deltatime);
-		fence1.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
-		if (fence2.GetCollider().CheckCollision(player.GetCollider(), 1.0f))
+		if(door.GetCollider().CheckCollision(player.GetCollider(), 1.0f) && sf::Keyboard::isKeyPressed(sf::Keyboard::A) && player.direction == 2)
 		{
 			state = SHOOTING;
-			return;
+			//text();
+			state = MENU;
+			menu();
+			shoot();
 		}
-		fence3.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		view.setCenter(player.GetPosition());
 
 		window.clear(sf::Color::Black);
 		window.draw(map);
-		fence1.Draw(window);
-		fence2.Draw(window);
-		fence3.Draw(window);
+		shop.Draw(window);
+		door.Draw(window);
+		//////////////
+		upLock.Draw(window);
+		leftLock.Draw(window);
+		rightLock.Draw(window);
+		downLock.Draw(window);
+		/////////////
 		player.Draw(window, view);
 		window.display();
 	}
@@ -184,16 +201,16 @@ void Menu::shoot()
 	//Gun
 	sf::RectangleShape gun(sf::Vector2f(50.0f, 100.0f));
 	sf::Texture gunTexture;
-	gunTexture.loadFromFile("strzelba.png");
+	gunTexture.loadFromFile("images/strzelba.png");
 	gun.setTexture(&gunTexture);
 	gun.setOrigin(gun.getSize() / 2.0f);
-	gun.setPosition(WIDTH/2.0f, HEIGHT + 50.0f);
+	gun.setPosition(WIDTH / 2.0f, HEIGHT + 50.0f);
 
 	int spawnCounter = 0;
 
 	//Targets
 	sf::Texture targetTexture;
-	targetTexture.loadFromFile("enemy.png");
+	targetTexture.loadFromFile("images/enemy.png");
 	enemy target(targetTexture);
 	std::vector<enemy> targets;
 
@@ -209,13 +226,13 @@ void Menu::shoot()
 	sf::RectangleShape crosshairRect(sf::Vector2f(160.0f, 160.0f));
 	sf::Vector2f crosshairPosition;
 
-	crosshairTexture.loadFromFile("crosshair.png");
+	crosshairTexture.loadFromFile("images/crosshair.png");
 	crosshairRect.setTexture(&crosshairTexture);
 	crosshairRect.setOrigin(crosshairRect.getSize() / 2.0f);
 
 
 	window.setMouseCursorVisible(false);
-	
+
 	while (window.isOpen()) {
 		sf::Event evnt;
 		while (window.pollEvent(evnt))
@@ -286,7 +303,7 @@ void Menu::shoot()
 
 			window.draw(targets[i].body);
 		}
-		viewShoot.setCenter(WIDTH/2.0f, HEIGHT/2.0f);
+		viewShoot.setCenter(WIDTH / 2.0f, HEIGHT / 2.0f);
 		window.setView(viewShoot);
 		window.draw(gun);
 		window.draw(crosshairRect);
@@ -306,7 +323,7 @@ void Menu::autor()
 
 	sf::Text tekst[ile];
 
-	string aut[] = { "Jan Szewczyk","Bartłomiej Wnuk", "Tu Trong Manh", "back" };
+	std::string aut[] = { "Jan Szewczyk","Bartlomiej Wnuk", "Tu Trong Manh", "back" };
 	for (int i = 0; i<ile; i++)
 	{
 		tekst[i].setFont(font);
@@ -315,12 +332,12 @@ void Menu::autor()
 		if (i == 3)
 		{
 			tekst[i].setString(aut[i]);
-			tekst[i].setPosition(WIDTH /4*3 - tekst[i].getGlobalBounds().width / 2, 150 + i *110);
+			tekst[i].setPosition(WIDTH /4.0f * 3.0f - tekst[i].getGlobalBounds().width / 2.0f, 150.0f + i *110.0f);
 			continue;
 		}
 
 		tekst[i].setString(aut[i]);
-		tekst[i].setPosition(WIDTH / 2 - tekst[i].getGlobalBounds().width / 2, 150 + i * 90);
+		tekst[i].setPosition(WIDTH / 2.0f - tekst[i].getGlobalBounds().width / 2.0f, 150.0f + i * 90.0f);
 	}
 
 
@@ -353,4 +370,65 @@ void Menu::autor()
 	}
 
 
+}
+
+void Menu::text()
+{
+	const int CHATPOSITION = 500;
+	sf::View viewText;
+	sf::Texture winChat;
+	winChat.loadFromFile("images/chat2.jpg");
+	sf::Sprite sprait;
+	sprait.setTexture(winChat);
+	sprait.setScale(sf::Vector2f(0.83f, 0.83f));
+	sprait.setPosition(-10, CHATPOSITION);
+	sprait.setScale(1.8, 1.8);
+
+		sf::Vector2f mouse(sf::Mouse::getPosition(window));
+		sf::Event event;
+		const int ile = 4;
+		sf::Text tekst[ile];
+		std::string str[] = { "ja:witaj skurwysynie:","On: Witaj tempy chuju!!! DAwaj Pieniądze albo w ryj","ja: Wypierdalaj za brame ", "ja: Jestem chujkiem, masz pieniadze" };
+		for (int i = 0; i < ile; i++)
+		{
+			tekst[i].setFont(font);
+			tekst[i].setCharacterSize(30);
+
+			tekst[i].setString(str[i]);
+			tekst[i].setPosition(100, CHATPOSITION + 20 + i * 50);
+		}
+
+		while (window.isOpen())
+		{
+			viewText.setCenter(WIDTH / 2.0f, HEIGHT / 2.0f);
+			window.setView(viewText);
+			sf::Vector2f mouse(sf::Mouse::getPosition(window));
+			sf::Event event;
+			while (window.pollEvent(event))
+			{
+				if (tekst[2].getGlobalBounds().contains(mouse) && event.type == sf::Event::MouseButtonReleased && event.key.code == sf::Mouse::Left)
+				{
+					return;
+				}
+				else if (tekst[3].getGlobalBounds().contains(mouse) && event.type == sf::Event::MouseButtonReleased && event.key.code == sf::Mouse::Left)
+				{
+					return;
+				}
+
+			}
+
+
+			for (int i = 2; i < ile; i++)
+			{
+				if (tekst[i].getGlobalBounds().contains(mouse))
+					tekst[i].setFillColor(sf::Color::Red);
+				else tekst[i].setFillColor(sf::Color::White);
+			}
+			window.clear();
+			window.draw(sprait);
+			for (int i = 0; i < ile; i++)
+				window.draw(tekst[i]);
+
+			window.display();
+		}
 }

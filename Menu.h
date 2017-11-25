@@ -5,11 +5,9 @@
 #include "Animation.h"
 #include "player.h"
 #include "Fence.h"
+#include "enemy.h"
 #include <Windows.h>
 #include <string>
-
-using namespace std;
-//using namespace sf;
 
 class Menu
 {
@@ -30,4 +28,5 @@ private:
 	void game();
 	void shoot();
 	void autor();
+	void text();
 };

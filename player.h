@@ -14,7 +14,9 @@ public:
 	Collider GetCollider() { return Collider(body); }
 	sf::Vector2f GetPosition() const { return  body.getPosition(); }
 	float collisionSize;
-private:
+	enum Direction { left, right, up, down };
+	Direction direction;
+private:	
 	Animation animation;
 	sf::RectangleShape body;
 	bool Stay;
