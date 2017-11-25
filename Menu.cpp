@@ -1,4 +1,5 @@
 ﻿#include "Menu.h"
+#include "enemy.h"
 
 const int WIDTH = 1100;
 const int HEIGHT = 720;
@@ -174,9 +175,12 @@ void Menu::game()
 void Menu::shoot()
 {
 	sf::View viewShoot;
+
 	srand(time(NULL));
+
 	//Window
 	window.setFramerateLimit(60);
+
 	//Gun
 	sf::RectangleShape gun(sf::Vector2f(50.0f, 100.0f));
 	sf::Texture gunTexture;
@@ -184,14 +188,15 @@ void Menu::shoot()
 	gun.setTexture(&gunTexture);
 	gun.setOrigin(gun.getSize() / 2.0f);
 	gun.setPosition(WIDTH/2.0f, HEIGHT + 50.0f);
-	int spawnCounter = 0;
-	//std::cout << sprawdz.x << " " << sprawdz.y;
-	//Targets
-	sf::RectangleShape target;
-	target.setFillColor(sf::Color::Blue);
-	target.setSize(sf::Vector2f(50.f, 50.f));
 
-	std::vector<sf::RectangleShape> targets;
+	int spawnCounter = 0;
+
+	//Targets
+	sf::Texture targetTexture;
+	targetTexture.loadFromFile("enemy.png");
+	enemy target(targetTexture);
+	std::vector<enemy> targets;
+
 
 	//Wektory, potrzebne
 	sf::Vector2f gunCenter;
@@ -241,14 +246,14 @@ void Menu::shoot()
 
 		//Enemies
 
-		if (spawnCounter < 30)
+		if (spawnCounter < 40)
 			spawnCounter++;
 
-		if (spawnCounter >= 30 && targets.size() < 10)
+		if (spawnCounter >= 40 && targets.size() < 10)
 		{
 			spawnCounter = 0;
 
-			target.setPosition(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
+			target.Position(sf::Vector2f(rand() % window.getSize().x, rand() % window.getSize().y));
 			targets.push_back(target);
 		}
 
@@ -258,7 +263,7 @@ void Menu::shoot()
 		{
 			for (size_t i = 0; i < targets.size(); i++)
 			{
-				if (targets[i].getGlobalBounds().contains(mousePosWindow))
+				if (targets[i].body.getGlobalBounds().contains(mousePosWindow))
 				{
 					targets.erase(targets.begin() + i);
 					break;
@@ -279,7 +284,7 @@ void Menu::shoot()
 		for (size_t i = 0; i < targets.size(); i++)
 		{
 
-			window.draw(targets[i]);
+			window.draw(targets[i].body);
 		}
 		viewShoot.setCenter(WIDTH/2.0f, HEIGHT/2.0f);
 		window.setView(viewShoot);
