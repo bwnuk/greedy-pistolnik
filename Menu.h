@@ -5,6 +5,7 @@
 #include "Animation.h"
 #include "player.h"
 #include "Fence.h"
+#include "Account.h"
 #include "enemy.h"
 #include <Windows.h>
 #include <string>
@@ -27,7 +28,7 @@ private:
 	void menu();
 	void game();
 	void shoot();
-	void shop();
+	void shop(player &p1);
 	void autor();
 	void text(std::string t, GameState k);
 };

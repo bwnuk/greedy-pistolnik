@@ -144,7 +144,10 @@ void Menu::game()
 	sf::Clock clock;
 	sf::View view;
 	sf::Vector2f sizeBG(background_texture.getSize());
-	
+	Account playerAccount;
+	playerAccount.set_money(500);
+
+
 	//Screen lock
 	Fence upLock(nullptr, sf::Vector2f(sizeBG.x, 0.0f), sf::Vector2f(sizeBG.x/2.0f, 0.0f));
 	Fence leftLock(nullptr, sf::Vector2f(0.0f, sizeBG.y), sf::Vector2f(0.0f, sizeBG.y/2.0f));
@@ -156,6 +159,7 @@ void Menu::game()
 	Fence door(nullptr, sf::Vector2f(2.0f * sizeSq, sizeSq), sf::Vector2f(7.0f * sizeSq, 8.0f * sizeSq + 16.0f));
 	Fence mountain(nullptr, sf::Vector2f(16.0f * sizeSq, 18.0f * sizeSq), sf::Vector2f(38.0f * sizeSq, 18.0f * sizeSq / 2.0f));
 	Fence enemySheriff(&enemy_texture, sf::Vector2f(2.0f * sizeSq, 2.0 * sizeSq), sf::Vector2f(48.0f * sizeSq, 18.0f * sizeSq / 2.0f));
+	
 	while (window.isOpen())
 	{
 		deltatime = clock.restart().asSeconds();
@@ -186,15 +190,18 @@ void Menu::game()
 		{
 			text("shop.txt", SHOP);
 			if(state == SHOP)
-				shop();
+				shop(player);
 		}
 		if (enemySheriff.GetCollider().CheckCollision(player.GetCollider(), 1.0f) && (player.direction == 2))
 		{
 			text("sherif.txt", SHOOT);
 			if (state == SHOOT)
+			{
 				shoot();
-
+				player.set_money(player.get_money() + 250);
+			}
 		}
+
 		view.setCenter(player.GetPosition());
 		window.clear(sf::Color::Black);
 		window.draw(map);
@@ -208,6 +215,7 @@ void Menu::game()
 		downLock.Draw(window);
 		/////////////
 		player.Draw(window, view);
+
 		window.display();
 	}
 }
@@ -440,7 +448,7 @@ void Menu::shoot()
 	}
 }
 
-void Menu::shop()
+void Menu::shop(player & p1)
 {
 
 	sf::View viewShoot;
@@ -517,7 +525,8 @@ void Menu::shop()
 			{
 				window.draw(texts[i]);
 			}
-
+			window.draw(p1.AccountText);
+			window.draw(p1.AccountTextMoney);
 			window.display();
 
 	}
