@@ -450,40 +450,49 @@ void Menu::shoot()
 
 void Menu::shop(player & p1)
 {
-
 	sf::View viewShoot;
+	
 	sf::Texture texture;
 	texture.loadFromFile("images/shop.png");
+	
 	sf::Sprite sprite;
 	sprite.setTexture(texture);
-
 	sprite.setScale(sf::Vector2f(0.8f, 1.5f));
 	sprite.setPosition(30, -200);
-	const int arraysize = 6;
-	sf::Text adam("Adam", font, 60);
+	
+	//Napis wyskakujacy
+	sf::Text Buy("Zakupiono", font, 80);
+	Buy.setPosition(400, 200);
+	Buy.setColor(sf::Color::Red);
+	int priceBuy = 0;
+
+	//Wektor cen przedmiotow
+	sf::Text shopText("", font, 60);
 	std::vector<sf::Text> texts;
-	sf::Text text[arraysize];
-	std::string shop_text[arraysize] = { "100$", "200$", "300$", "400$", "999$", "Wyjdz"};
+	std::string out = "Exit";
+	std::vector<int> shop_prices = { 100, 200, 300, 400, 999};
+	
+	sf::Mouse::setPosition(sf::Vector2i(400, 200));
 
+	bool temp = 0;
 
-	for (int i = 0; i < arraysize - 1; i++)
+	for (int i = 0; i < shop_prices.size(); i++)
 	{
-		adam.setFont(font);
-		adam.setCharacterSize(60);
-		adam.setString(shop_text[i]);
-		adam.setPosition(80 + i * 200, 640);
-		texts.push_back(adam);
+		shopText.setString(std::to_string(shop_prices[i])+" $");
+		shopText.setPosition(80 + i * 200, 640);
+		texts.push_back(shopText);
 	}
-	adam.setFont(font);
-	adam.setCharacterSize(60);
-	adam.setString(shop_text[5]);
-	adam.setPosition(100.0f, 0.0f);
-	texts.push_back(adam);
+	
+	//Ustawianie wyjscia
+	shopText.setString(out);
+	shopText.setPosition(100.0f, 0.0f);
+	texts.push_back(shopText);
 
 	while (window.isOpen())
 	{
 		sf::Vector2f mausePos(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y + 90.0f);
 		sf::Event evnt;
+		
 		while (window.pollEvent(evnt))
 		{
 			switch (evnt.type)
@@ -503,32 +512,61 @@ void Menu::shop(player & p1)
 		viewShoot.setCenter(WIDTH / 2.0f, HEIGHT / 2.0f);
 		window.setView(viewShoot);
 
-		for (int i = 0; i<texts.size() - 1; i++)
+		for (int i = 0; i < texts.size() - 1; i++)
+		{
 			if (texts[i].getGlobalBounds().contains(mausePos))
 			{
 				texts[i].setFillColor(sf::Color::Red);
+				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+				{
+					if (shop_prices[i] < p1.get_money())
+					{
+						priceBuy = shop_prices[i];
+						temp = 1;
+					}
+				}
 			}
 			else texts[i].setFillColor(sf::Color::White);
-			mausePos.x = sf::Mouse::getPosition(window).x; 
-			mausePos.y = sf::Mouse::getPosition(window).y - 50.0f;
-			if (texts[5].getGlobalBounds().contains(mausePos))
-			{
+		}
+
+		mausePos.x = sf::Mouse::getPosition(window).x; 
+		mausePos.y = sf::Mouse::getPosition(window).y - 50.0f;
+		
+		if (texts[5].getGlobalBounds().contains(mausePos))
+		{
 				texts[5].setFillColor(sf::Color::Red);
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 					return;
-			}
-			else texts[5].setFillColor(sf::Color::White);
-			window.clear();
-			window.draw(sprite);
+		}
+		else
+		{
+			texts[5].setFillColor(sf::Color::White);
+		}
 
-			for (int i = 0; i < texts.size(); i++)
+		window.clear();
+		window.draw(sprite);
+
+		for (int i = 0; i < texts.size(); i++)
 			{
 				window.draw(texts[i]);
 			}
+
+		if (temp == 1) 
+		{
+			window.draw(Buy);
+
+			p1.set_money(p1.get_money() - priceBuy);
+			p1.money_changes();
 			window.draw(p1.AccountText);
 			window.draw(p1.AccountTextMoney);
 			window.display();
-
+			Sleep(2000);
+			return;
+		}
+		
+		window.draw(p1.AccountText);
+		window.draw(p1.AccountTextMoney);
+		window.display();
 	}
 }
 

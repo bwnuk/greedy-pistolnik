@@ -37,7 +37,7 @@ player::~player()
 
 void player::Update(float deltaTime)
 {
-	AccountTextMoney.setString(std::to_string(get_money()));
+	money_changes();
 	sf::Vector2f movement(0.0f, 0.0f);
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 		movement.x -= speed*deltaTime;
@@ -92,4 +92,9 @@ void player::Draw(sf::RenderWindow &window, sf::View view)
 	//window.draw(AccountText);
 	//window.draw(AccountTextMoney);
 	window.setView(view);
+}
+
+void player::money_changes()
+{
+	AccountTextMoney.setString(std::to_string(get_money()) + "$");
 }
