@@ -454,7 +454,7 @@ void Menu::shoot()
 		std::cout << end <<std::endl;
 		std::cout << elapsed_secs << std::endl;
 		
-		if (elapsed_secs > 2)
+		if (elapsed_secs > 12)
 		{
 			lose = 1;
 			return;
