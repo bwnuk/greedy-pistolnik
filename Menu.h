@@ -8,7 +8,7 @@
 #include "enemy.h"
 #include <Windows.h>
 #include <string>
-
+#include <fstream>
 class Menu
 {
 public:
@@ -18,7 +18,7 @@ public:
 	void runGame();
 	
 protected:
-	enum GameState { MENU, GAME, SHOOTING, AUTORS, GAME_OVER, END };
+	enum GameState { MENU, GAME, SHOP, AUTORS, GAME_OVER, END };
 	GameState state;
 
 private:
@@ -27,6 +27,7 @@ private:
 	void menu();
 	void game();
 	void shoot();
+	void shop();
 	void autor();
 	void text();
 };
