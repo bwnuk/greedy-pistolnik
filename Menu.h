@@ -10,6 +10,8 @@
 #include <Windows.h>
 #include <string>
 #include <fstream>
+#include <ctime>
+
 class Menu
 {
 public:
@@ -23,6 +25,7 @@ protected:
 	GameState state;
 
 private:
+	bool lose;
 	sf::Font font;
 	
 	void menu();

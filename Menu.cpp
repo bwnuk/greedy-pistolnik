@@ -129,6 +129,11 @@ void Menu::game()
 	sf::Texture enemy_texture;
 	sf::Sprite map;
 	
+	lose = 0;
+	sf::Text textLose("Przegrales", font, 80);
+	textLose.setColor(sf::Color::Red);
+	textLose.setPosition(1400.0f, 400.0f);
+
 	texture.loadFromFile("images/player.png");
 	background_texture.loadFromFile("images/mapa.png");
 	shop_texture.loadFromFile("images/shop.png");
@@ -201,6 +206,7 @@ void Menu::game()
 				player.set_money(player.get_money() + 250);
 			}
 		}
+		
 
 		view.setCenter(player.GetPosition());
 		window.clear(sf::Color::Black);
@@ -215,14 +221,21 @@ void Menu::game()
 		downLock.Draw(window);
 		/////////////
 		player.Draw(window, view);
-
-		window.display();
+		if (lose == 1)
+		{
+			window.draw(textLose);
+			window.display();
+			Sleep(2000);
+		}
+		else
+			window.display();
+		lose = 0;
 	}
 }
 
 void Menu::shoot()
 {
-
+	//Background
 	sf::Texture background_texture1;
 	background_texture1.loadFromFile("images/shootBCG1.jpg");
 	sf::Sprite map1;
@@ -230,6 +243,12 @@ void Menu::shoot()
 	map1.setScale(sf::Vector2f(1.2f, 1.6f));
 	map1.setPosition(0, -140);
 	sf::View viewShoot;
+
+	//Time
+	std::clock_t begin = clock();
+	std::cout << begin;
+	std::clock_t end;
+	sf::Text textTime;
 
 	int killCounter = 0;
 	sf::Text textKills("Kills: ", font, 40);
@@ -424,23 +443,38 @@ void Menu::shoot()
 
 		if (killCounter == 5)
 		{
-			std::cout << 407;
+			lose = 0;
 			return;
-
 		}
 
+		//Clock
+		end = clock();
+		double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+		
+		std::cout << end <<std::endl;
+		std::cout << elapsed_secs << std::endl;
+		
+		if (elapsed_secs > 2)
+		{
+			lose = 1;
+			return;
+		}
+		textTime.setFont(font);
+		textTime.setCharacterSize(30);
+		textTime.setString("Time: " + std::to_string(elapsed_secs));
+		textTime.setPosition(430.0f, -90.0f);
 
 		window.clear();
 		window.draw(map1);
 		for (size_t i = 0; i < targets.size(); i++)
 		{
-
 			window.draw(targets[i].body);
 		}
 
 		viewShoot.setCenter(WIDTH / 2.0f, HEIGHT / 2.0f);
 		window.setView(viewShoot);
 		window.draw(gun);
+		window.draw(textTime);
 		window.draw(textKills);
 		window.draw(textKillsNumber);
 		window.draw(crosshairRect);
@@ -542,8 +576,7 @@ void Menu::shop(player & p1)
 		{
 			texts[5].setFillColor(sf::Color::White);
 		}
-
-		window.clear();
+				window.clear();
 		window.draw(sprite);
 
 		for (int i = 0; i < texts.size(); i++)
