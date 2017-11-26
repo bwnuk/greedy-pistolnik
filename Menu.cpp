@@ -126,12 +126,13 @@ void Menu::game()
 	sf::Texture texture;
 	sf::Texture background_texture;
 	sf::Texture shop_texture;
+	sf::Texture enemy_texture;
 	sf::Sprite map;
 	
 	texture.loadFromFile("images/player.png");
 	background_texture.loadFromFile("images/mapa.png");
 	shop_texture.loadFromFile("images/shop.png");
-	
+	enemy_texture.loadFromFile("images/19.png");
 	map.setTexture(background_texture);
 	map.setPosition(0.0f, 0.0f);
 	
@@ -154,6 +155,7 @@ void Menu::game()
 	Fence building(nullptr, sf::Vector2f(13.0f * sizeSq, 9.0f * sizeSq), sf::Vector2f(13.0f * sizeSq / 2.0f, 9.0f * sizeSq / 2.0f));
 	Fence door(nullptr, sf::Vector2f(2.0f * sizeSq, sizeSq), sf::Vector2f(7.0f * sizeSq, 8.0f * sizeSq + 16.0f));
 	Fence mountain(nullptr, sf::Vector2f(16.0f * sizeSq, 18.0f * sizeSq), sf::Vector2f(38.0f * sizeSq, 18.0f * sizeSq / 2.0f));
+	Fence enemySheriff(&enemy_texture, sf::Vector2f(2.0f * sizeSq, 2.0 * sizeSq), sf::Vector2f(48.0f * sizeSq, 18.0f * sizeSq / 2.0f));
 	while (window.isOpen())
 	{
 		deltatime = clock.restart().asSeconds();
@@ -177,19 +179,27 @@ void Menu::game()
 		downLock.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		mountain.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
 		building.GetCollider().CheckCollision(player.GetCollider(), 1.0f);
-		
+
 		player.Update(deltatime);
 		
 		if(door.GetCollider().CheckCollision(player.GetCollider(), 1.0f) && ( player.direction == 2 ))
 		{
-			text();
+			text("shop.txt", SHOP);
 			if(state == SHOP)
 				shop();
+		}
+		if (enemySheriff.GetCollider().CheckCollision(player.GetCollider(), 1.0f) && (player.direction == 2))
+		{
+			text("sherif.txt", SHOOT);
+			if (state == SHOOT)
+				shoot();
+
 		}
 		view.setCenter(player.GetPosition());
 		window.clear(sf::Color::Black);
 		window.draw(map);
 		///
+		enemySheriff.Draw(window);
 		//mountain.Draw(window);
 		//////////////
 		upLock.Draw(window);
@@ -511,8 +521,6 @@ void Menu::shop()
 			window.display();
 
 	}
-
-
 }
 
 void Menu::autor()
@@ -576,9 +584,9 @@ void Menu::autor()
 
 }
 
-void Menu::text()
+void Menu::text(std::string t, GameState k)
 {
-	std::fstream file("shop.txt", std::ios::in);
+	std::fstream file(t, std::ios::in);
 	const int CHATPOSITION = 600;
 	sf::View viewChat;
 	sf::Texture winChat;
@@ -625,7 +633,7 @@ void Menu::text()
 			{
 				if (tekst[2].getGlobalBounds().contains(mouse) && event.type == sf::Event::MouseButtonReleased && event.key.code == sf::Mouse::Left)
 				{
-					state = SHOP;
+					state = k;
 					return;
 				}
 				else if (tekst[3].getGlobalBounds().contains(mouse) && event.type == sf::Event::MouseButtonReleased && event.key.code == sf::Mouse::Left)

@@ -18,7 +18,7 @@ public:
 	void runGame();
 	
 protected:
-	enum GameState { MENU, GAME, SHOP, AUTORS, GAME_OVER, END };
+	enum GameState { MENU, GAME, SHOP, SHOOT, AUTORS, GAME_OVER, END };
 	GameState state;
 
 private:
@@ -29,5 +29,5 @@ private:
 	void shoot();
 	void shop();
 	void autor();
-	void text();
+	void text(std::string t, GameState k);
 };
